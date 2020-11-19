@@ -4,6 +4,7 @@ import random
 
 REPO_URL = 'https://github.com/anra-dev/repo.git'
 
+
 def deploy():
     """развернуть"""
     site_folder = f'/home/{env.user}/sites/{env.host}'
