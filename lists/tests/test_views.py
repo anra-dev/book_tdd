@@ -5,7 +5,10 @@ from django.http import HttpRequest
 from django.utils.html import escape
 from lists.views import home_page
 from lists.models import Item, List
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR
+from lists.forms import (
+    DUPLICATE_ITEM_ERROR, EMPTY_ITEM_ERROR,
+    ExistingListItemForm, ItemForm
+    )
 
 
 class HomePageTest(TestCase):
@@ -80,6 +83,13 @@ class ListViewTest(TestCase):
 
         self.assertRedirects(response, f'/lists/{correct_list.id}/')
 
+    def test_display_item_form(self):
+        """тест: отображение формы для элемента"""
+        list_ = List.objects.create()
+        response = self.client.get(f'/lists/{list_.id}/')
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
+        self.assertContains(response, 'name="text"')
+
     def post_invalid_input(self):
         """отправляет недопустимый ввод"""
         list_ = List.objects.create()
@@ -102,14 +112,13 @@ class ListViewTest(TestCase):
     def test_for_invalid_input_passes_form_to_template(self):
         """тест на недопустимый ввод: форма передается в шаблон"""
         response = self.post_invalid_input()
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
 
     def test_for_invalid_input_shows_error_on_page(self):
         """тест на недопустимый ввод: на странице показывается ошибка"""
         response = self.post_invalid_input()
         self.assertContains(response, escape(EMPTY_ITEM_ERROR))
 
-    @skip
     def test_duplicate_item_validation_error_on_page(self):
         """тест: ошибки валидации повторяющегося элемента
         оканчиваются на странице списков"""
@@ -119,17 +128,12 @@ class ListViewTest(TestCase):
             f'/lists/{list1.id}/',
             data={'text': 'textey'}
         )
-        expected_error = escape("You'vi already got this in your list")
+        expected_error = escape(DUPLICATE_ITEM_ERROR)
         self.assertContains(response, expected_error)
         self.assertTemplateUsed(response, 'list.html')
         self.assertEqual(Item.objects.all().count(), 1)
 
-    def test_display_item_form(self):
-        """тест: отображение формы для элемента"""
-        list_ = List.objects.create()
-        response = self.client.get(f'/lists/{list_.id}/')
-        self.assertIsInstance(response.context['form'], ItemForm)
-        self.assertContains(response, 'name="text"')
+
 
 
 class NewListTest(TestCase):
