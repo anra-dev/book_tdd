@@ -1,7 +1,7 @@
 from .base import FunctionalTest
 from selenium.webdriver.common.keys import Keys
 
-class ItenValidationTest(FunctionalTest):
+class ItemValidationTest(FunctionalTest):
     """тест валидации элемента списка"""
 
     def get_error_element(self):

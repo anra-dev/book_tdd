@@ -14,6 +14,7 @@ sudo apt-get install nginx git python3 python3-venv
 ## Служба Systemd
 * см. gunicorn-systemd.template.service
 * заменить SITENAME, например, на staging.my-domain.com
+* заменить SEKRIT почтовым паролем
 ## Структура папок:
 Если допустить, что есть учетная запись пользователя в /home/username
 /home/username 
